@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anime — Anime Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@400;600;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+  <!-- SEO & Social meta -->
+  <meta name="description" content="Anime Garden — anime news, reviews, and features.">
+  <meta property="og:title" content="Anime Garden" />
+  <meta property="og:description" content="Latest anime news and features." />
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+<link rel="icon" href="assets/logo1.png" type="image/png">
+<style>
+  :root {
+    --bg-deep: #0d0608;
+    --bg-card: #160b0e;
+    --crimson: #8b1a2a;
+    --crimson-bright: #c0273d;
+    --rose: #e8455a;
+    --rose-light: #f0758a;
+    --cream: #f5e6d3;
+    --warm-white: #fdf5ef;
+    --muted: #9a7a82;
+    --gold: #d4956a;
+    --gold-light: #f0b88a;
+    --border: rgba(192,39,61,0.25);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--cream);
+    font-family: 'Nunito', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Subtle grain overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,6,8,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--crimson), var(--rose));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 0 16px rgba(232,69,90,0.4);
+  }
+  .logo-text {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--warm-white);
+    letter-spacing: 0.04em;
+  }
+  .logo-text span { color: var(--rose); }
+
+  nav { display: flex; gap: 0.25rem; }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  nav a:hover, nav a.active {
+    color: var(--rose-light);
+    background: rgba(192,39,61,0.15);
+  }
+
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .search-bar {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px 6px 36px;
+    color: var(--cream);
+    font-size: 0.85rem;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    width: 180px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .search-wrap { position: relative; }
+  .search-wrap svg {
+    position: absolute; left: 11px; top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.4;
+  }
+  .search-bar:focus {
+    width: 220px;
+    border-color: var(--rose);
+    background: rgba(192,39,61,0.08);
+  }
+  .btn-sub {
+    background: linear-gradient(135deg, var(--crimson), var(--crimson-bright));
+    color: var(--warm-white);
+    border: none;
+    border-radius: 20px;
+    padding: 7px 18px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .btn-sub:hover {
+    background: linear-gradient(135deg, var(--crimson-bright), var(--rose));
+    box-shadow: 0 4px 20px rgba(232,69,90,0.4);
+    transform: translateY(-1px);
+  }
+
+  /* ── PAGE TITLE ── */
+  .page-title-section {
+    padding: 3rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 900;
+    color: var(--warm-white);
+    margin-bottom: 0.5rem;
+  }
+  .page-title .accent { color: var(--rose); }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--warm-white);
+    margin-bottom: 2rem;
+  }
+
+  /* ── NEWS GRID ── */
+  .news-section {
+    padding: 3rem 2rem;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.8rem;
+  }
+
+  .news-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(139,26,42,0.3);
+    border-color: var(--rose);
+  }
+
+  .news-thumb {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-red {
+    background: linear-gradient(135deg, #8b1a2a 0%, #c0273d 50%, #e8455a 100%);
+  }
+
+  .card-dark {
+    background: linear-gradient(135deg, #2a0a10 0%, #4d1520 40%, #8b1a2a 70%, #c0273d 100%);
+  }
+
+  .card-warm {
+    background: linear-gradient(135deg, #d4956a 0%, #f0b88a 100%);
+  }
+
+  .card-teal {
+    background: linear-gradient(135deg, #2a4a6a 0%, #4a7a9a 100%);
+  }
+
+  .news-body {
+    padding: 1.4rem;
+  }
+
+  .news-cat {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rose-light);
+    margin-bottom: 0.6rem;
+  }
+
+  .news-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--warm-white);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .news-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .news-tag {
+    background: rgba(192,39,61,0.2);
+    color: var(--rose-light);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-col h5 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1rem;
+    color: var(--warm-white);
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .footer-col a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover {
+    color: var(--rose-light);
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .socials {
+    display: flex;
+    gap: 10px;
+  }
+
+  .social-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .social-btn:hover {
+    background: rgba(192,39,61,0.2);
+    border-color: var(--rose);
+    color: var(--rose-light);
+    transform: translateY(-2px);
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .news-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 600px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 1rem; }
+    .page-title { font-size: 1.8rem; }
+  }
+  /* Search modal styles */
+  .search-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1200; }
+  .search-modal.active { display: flex; }
+  .search-modal-content { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.03); width: min(900px, 94%); max-height: 70vh; overflow: auto; border-radius: 10px; padding: 12px; }
+  .search-modal-header { display:flex; justify-content:space-between; align-items:center; gap:12px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .search-results-list { display:flex; flex-direction:column; gap:8px; padding:10px 0; }
+  .search-result { display:block; padding:10px; border-radius:8px; text-decoration:none; color:var(--cream); background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+  .search-result:hover { background: rgba(232,69,90,0.06); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="index.html">
+    <div class="logo-icon"><img src="assets/logo1.png" alt="Anime Garden Logo"></div>
+    <span class="logo-text">Anime <span>Garden</span></span>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="anime.html" class="active">Anime</a>
+    <a href="manga.html">Manga</a>
+    <a href="reviews.html">Reviews</a>
+    <a href="community.html">Community</a>
+  </nav>
+  <div class="header-right">
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="#f0758a" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="globalSearch" class="search-bar" type="text" placeholder="Search anime, manga, reviews..." onkeypress="if(event.key==='Enter'){ event.preventDefault(); performSearchFromInput(this); }">
+    </div>
+    <button class="btn-sub">Subscribe</button>
+  </div>
+</header>
+
+<!-- PAGE TITLE -->
+<section class="page-title-section">
+  <h1 class="page-title">Latest <span class="accent">Anime</span></h1>
+  <p class="page-subtitle">Discover the newest anime episodes, releases, and trending shows from around the world.</p>
+</section>
+
+<!-- NEWS GRID -->
+<section class="news-section">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Anime News </h2>
+    </div>
+    <div class="news-grid">
+
+      <a href="onepice1anime.html" class="news-card" aria-label="Read more about Demon Slayer Infinity Castle Arc">
+        <div class="news-thumb card-red">
+          <img src="assets/onepice1.jpg" alt="Hot News" class="icon" style="width: 100%; height: auto; display: block; object-fit: cover;">
+        </div>
+        <div class="news-body">
+          <div class="news-cat">Anime · One Piece</div>
+          <div class="news-title">سيؤدي ساتورو جوجو صوت شخصية لوكي، وهي شخصية من قوس إلباف.</div>
+          <div class="news-meta">
+            <span>30/03/2026</span>
+            <span class="news-tag">News</span>
+          </div>
+        </div>
+      </a>
+
+      <!--<a href="chainsaw-man-review.html" class="news-card">
+        <div class="news-thumb card-dark"><img src="assets/news-review.svg" alt="Review" class="icon"></div>
+        <div class="news-body">
+          <div class="news-cat">Manga · Review</div>
+          <div class="news-title">Chainsaw Man Chapter 168 Review: Power Dynamics Shift</div>
+          <div class="news-meta">
+            <span>5 hrs ago</span>
+            <span class="news-tag">Review</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="one-piece-season2-cast.html" class="news-card">
+        <div class="news-thumb card-warm"><img src="assets/news-exclusive.svg" alt="Exclusive" class="icon"></div>
+        <div class="news-body">
+          <div class="news-cat">Anime · Live Action</div>
+          <div class="news-title">One Piece Season 2: New Cast Members Revealed by Netflix</div>
+          <div class="news-meta">
+            <span>8 hrs ago</span>
+            <span class="news-tag">Exclusive</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="weekly-shonen-jump-rankings.html" class="news-card">
+        <div class="news-thumb card-teal"><img src="assets/news-rankings.svg" alt="Rankings" class="icon"></div>
+        <div class="news-body">
+          <div class="news-cat">Manga · Ranking</div>
+          <div class="news-title">Weekly Shonen Jump Rankings — Top 10 This Week</div>
+          <div class="news-meta">
+            <span>1 day ago</span>
+            <span class="news-tag">Rankings</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="studio-ghibli-new-film.html" class="news-card">
+        <div class="news-thumb card-green"><img src="assets/news-mustsee.svg" alt="Must See" class="icon"></div>
+        <div class="news-body">
+          <div class="news-cat">Anime · Industry</div>
+          <div class="news-title">Studio Ghibli Announces New Film for 2026 — First Look</div>
+          <div class="news-meta">
+            <span>1 day ago</span>
+            <span class="news-tag">Must See</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="naruto-minato-spin-off.html" class="news-card">
+        <div class="news-thumb card-gold"><img src="assets/news-new.svg" alt="New" class="icon"></div>
+        <div class="news-body">
+          <div class="news-cat">Manga · Spotlight</div>
+          <div class="news-title">Naruto Returns: Minato Spin-Off Manga Chapter 1 First Look</div>
+          <div class="news-meta">
+            <span>2 days ago</span>
+            <span class="news-tag">New</span>
+          </div>
+        </div>
+      </a>-->
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h5>Content</h5>
+      <a href="anime.html">Anime</a>
+      <a href="manga.html">Manga</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="community.html">Community</a>
+    </div>
+    <div class="footer-col">
+      <h5>Resources</h5>
+      <a href="#">Anime Database</a>
+      <a href="#">Character Wiki</a>
+      <a href="#">Episode Guide</a>
+      <a href="#">Rankings</a>
+    </div>
+    <div class="footer-col">
+      <h5>Community</h5>
+      <a href="#">Forums</a>
+      <a href="#">Write for Us</a>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About Us</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Anime Garden. Made with ❤️ for anime fans worldwide.</p>
+    <div class="socials">
+      <a class="social-btn" href="#"><img src="assets/social-x.svg" alt="X"></a>
+      <a class="social-btn" href="#"><img src="assets/social-ig.svg" alt="Instagram"></a>
+      <a class="social-btn" href="#"><img src="assets/social-yt.svg" alt="YouTube"></a>
+      <a class="social-btn" href="#"><img src="assets/social-dc.svg" alt="Discord"></a>
+    </div>
+  </div>
+</footer>
+
+  <!-- Search Modal -->
+  <div id="searchModal" class="search-modal">
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <h3>Search Results</h3>
+        <button onclick="closeSearchModal()">✕</button>
+      </div>
+      <div id="searchResultsList" class="search-results-list"></div>
+    </div>
+  </div>
+
+<script>
+  // Subscribe button functionality
+  // Subscribe button
+  document.querySelectorAll('.btn-sub').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('✅ Thank you for subscribing!\n\nCheck your email for updates.');
+    });
+  });
+
+  // Search handled by search.js (Fuse.js)
+
+  // Hover effect on news cards
+  document.querySelectorAll('.news-card').forEach(card => {
+    card.addEventListener('click', () => {
+      card.style.transition = 'transform 0.1s';
+      card.style.transform = 'scale(0.98)';
+      setTimeout(() => { card.style.transform = ''; }, 150);
+    });
+  });
+  </script>
+  <script src="search.js"></script>
+
+</body>
+</html>
